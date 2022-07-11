@@ -1,3 +1,5 @@
 tesseract-ocr
 tesseract-ocr-fas
 pkg-config
+libfreetype6-dev
+libpng12-dev
