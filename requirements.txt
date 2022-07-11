@@ -1,0 +1,8 @@
+parsivar==0.2.3
+pytesseract==0.3.9
+opencv-python==4.6.0.66
+scikit-image==0.19.3
+Pillow==9.1.1
+matplotlib==3.2.2
+ipykernel==6.15.0
+streamlit==1.10.0
