@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from ocr_utils import *
-
 import warnings
+import os
 
 warnings.filterwarnings("ignore")
 
@@ -16,11 +16,10 @@ st.set_page_config(
 
 st.title("📖 Persian OCR")
 
-
 def scan(file_name):
     img = Image.open(file_name)
     img.thumbnail((800, 800), Image.ANTIALIAS)
-    image = np.array(img)
+    image = cv2.imread(file_name)
     resize_ratio = 500 / image.shape[0]
     original = image.copy()
     image = opencv_resize(image, resize_ratio)
@@ -47,7 +46,6 @@ def scan(file_name):
     result = bw_scanner(scanned)
     return result
 
-
 input_col, output_col = st.columns(2)
 with input_col:
     with st.form("form1", clear_on_submit=True):
@@ -55,11 +53,18 @@ with input_col:
         submit = st.form_submit_button("Submit")
         if submit:
             if content_file is not None:
-                result = scan(content_file)
+                with open(os.path.join("Uploaded", content_file.name), "wb") as f:
+                    f.write(content_file.getbuffer())                
+                result = scan(os.path.join("Uploaded", content_file.name))
                 with output_col:
                     st.image(
                         result,
                         caption="scanned image",
                         use_column_width="always",
                         output_format="PNG",
-                    )
+                    )           
+                    output = Image.fromarray(result)
+                    path = os.path.join(os.getcwd(), f"scan")
+                    file_path = os.path.join(path, f"{content_file.name}.png")
+                    final_path = os.path.splitext(file_path)[0]
+                    output.save(final_path)

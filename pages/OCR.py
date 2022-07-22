@@ -4,10 +4,7 @@ import streamlit as st
 import pytesseract
 from pytesseract import Output
 from ocr_utils import *
-from parsivar import Normalizer
-
-my_normalizer = Normalizer(statistical_space_correction=True)
-
+import os
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -36,11 +33,16 @@ def ocr(file_name):
     # hocr = pytesseract.image_to_pdf_or_hocr(image, lang="fas", extension="hocr")
     return boxes, extracted_text
 
+def file_selector(folder_path='./scan'):
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox('Select a file', filenames)
+    return os.path.join(folder_path, selected_filename)
 
 input_col, output_col = st.columns(2)
 with input_col:
     with st.form("form2", clear_on_submit=True):
-        content_file = st.file_uploader("Upload your image here")
+        # content_file = st.file_uploader("Upload your image here")
+        content_file = file_selector()
         submit = st.form_submit_button("Submit")
         if submit:
             if content_file is not None:
@@ -53,7 +55,7 @@ with input_col:
                         output_format="PNG",
                     )
                     with input_col:
-                        output_text = f"""<p dir="rtl" align="justify">{my_normalizer.normalize(extracted_text)}</p>"""
+                        output_text = f"""<p dir="rtl" align="justify">{extracted_text}</p>"""
                         st.markdown(output_text, unsafe_allow_html=True)
                         download_image = st.button("Download Image")
                         download_pdf = st.button("Download Report")

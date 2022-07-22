@@ -4,29 +4,24 @@ import matplotlib.pyplot as plt
 from skimage.filters import threshold_local
 from PIL import Image
 
-
 def opencv_resize(image, ratio):
     width = int(image.shape[1] * ratio)
     height = int(image.shape[0] * ratio)
     dim = (width, height)
     return cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-
 def plot_rgb(image):
     plt.figure(figsize=(16, 10))
     return plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-
 def plot_gray(image):
-    plt.figure(figsize=(16, 10))
+    fig = plt.figure(figsize=(16, 10))
     return plt.imshow(image, cmap="Greys_r")
-
 
 def bw_scanner(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     T = threshold_local(gray, 21, offset=5, method="gaussian")
     return (gray > T).astype("uint8") * 255
-
 
 def contour_to_rect(contour, resize_ratio):
     pts = contour.reshape(4, 2)
@@ -43,7 +38,6 @@ def contour_to_rect(contour, resize_ratio):
     rect[1] = pts[np.argmin(diff)]
     rect[3] = pts[np.argmax(diff)]
     return rect / resize_ratio
-
 
 def wrap_perspective(img, rect):
     # unpack rectangle points: top left, top right, bottom right, bottom left
@@ -68,12 +62,10 @@ def wrap_perspective(img, rect):
     # warp the perspective to grab the screen
     return cv2.warpPerspective(img, M, (maxWidth, maxHeight))
 
-
 # approximate the contour by a more primitive polygon shape
 def approximate_contour(contour):
     peri = cv2.arcLength(contour, True)
     return cv2.approxPolyDP(contour, 0.032 * peri, True)
-
 
 def get_receipt_contour(contours):
     # loop over the contours
