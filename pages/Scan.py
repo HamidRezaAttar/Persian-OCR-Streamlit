@@ -1,9 +1,12 @@
+from cProfile import label
 import streamlit as st
 import pandas as pd
 import numpy as np
 from ocr_utils import *
 import warnings
 import os
+from io import BytesIO
+
 
 warnings.filterwarnings("ignore")
 
@@ -54,7 +57,7 @@ with input_col:
         if submit:
             if content_file is not None:
                 with open(os.path.join("Uploaded", content_file.name), "wb") as f:
-                    f.write(content_file.getbuffer())                
+                    f.write(content_file.getbuffer())
                 result = scan(os.path.join("Uploaded", content_file.name))
                 with output_col:
                     st.image(
@@ -62,9 +65,15 @@ with input_col:
                         caption="scanned image",
                         use_column_width="always",
                         output_format="PNG",
-                    )           
+                    )
                     output = Image.fromarray(result)
+
+                    buf = BytesIO()
+                    output.save(buf, format="JPEG")
+                    byte_im = buf.getvalue()
+                    button = st.download_button(label="Download Image", data=byte_im, file_name=f"Scanned_{content_file.name}", mime="image/png")
                     path = os.path.join(os.getcwd(), f"scan")
-                    file_path = os.path.join(path, f"{content_file.name}.png")
-                    final_path = os.path.splitext(file_path)[0]
-                    output.save(final_path)
+
+                    # file_path = os.path.join(path, f"{content_file.name}.png")
+                    # final_path = os.path.splitext(file_path)[0]
+                    # output.save(final_path)
